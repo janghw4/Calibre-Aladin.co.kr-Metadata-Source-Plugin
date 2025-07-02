@@ -16,27 +16,11 @@ from functools import partial
 # from PyQt4.Qt import (QLabel,QTableWidgetItem, QVBoxLayout, Qt, QGroupBox, QTableWidget,
 #                      QCheckBox, QAbstractItemView, QHBoxLayout, QIcon,QInputDialog)
 # FIXED: Updated PyQt imports for modern Calibre compatibility
-try:
-    # Modern Calibre (Qt5/Qt6) - preferred method
-    from qt.core import Qt
-    from qt import QtWidgets as QtGui
-    from qt.core import (QLabel, QTableWidgetItem, QVBoxLayout, QGroupBox, QTableWidget,
-                        QCheckBox, QAbstractItemView, QHBoxLayout, QIcon, QInputDialog)
-except ImportError:
-    try:
-        # Fallback for Calibre with PyQt5
-        from PyQt5.Qt import Qt
-        from PyQt5 import QtWidgets as QtGui
-        from PyQt5.Qt import (QLabel, QTableWidgetItem, QVBoxLayout, QGroupBox, QTableWidget,
-                             QCheckBox, QAbstractItemView, QHBoxLayout, QIcon, QInputDialog)
-    except ImportError:
-        try:
-            # Legacy fallback for very old Calibre with PyQt4
-            from PyQt4 import QtGui
-            from PyQt4.Qt import (QLabel, QTableWidgetItem, QVBoxLayout, Qt, QGroupBox, QTableWidget,
-                                 QCheckBox, QAbstractItemView, QHBoxLayout, QIcon, QInputDialog)
-        except ImportError:
-            raise ImportError("Could not import Qt widgets. Please update Calibre.")
+# PyQt imports for Calibre 8 (Qt6)
+from PyQt5.Qt import Qt
+from PyQt5 import QtWidgets as QtGui
+from PyQt5.Qt import (QLabel, QTableWidgetItem, QVBoxLayout, QGroupBox, QTableWidget,
+                     QCheckBox, QAbstractItemView, QHBoxLayout, QIcon, QInputDialog)
 
 from calibre.gui2 import get_current_db, question_dialog, error_dialog
 
