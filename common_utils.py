@@ -11,23 +11,35 @@ import os
 #                      QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
 #                      QRegExpValidator, QRegExp, QVariant, QTextEdit,
 #                      QListWidget, QAbstractItemView)
+# FIXED: Updated PyQt imports for modern Calibre compatibility
 try:
-    from PyQt4 import QtGui
+    # Modern Calibre (Qt5/Qt6) - preferred method
+    from qt.core import (Qt, QIcon, QPixmap, QLabel, QDialog, QHBoxLayout,
+                        QTableWidgetItem, QFont, QLineEdit, QComboBox,
+                        QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
+                        QRegExpValidator, QRegExp, QVariant, QTextEdit,
+                        QListWidget, QAbstractItemView)
+    from qt import QtWidgets as QtGui
 except ImportError:
-    # from PyQt5 import QtGui
-    from PyQt5 import Qt as QtGui
-try:
-    from PyQt4.Qt import (Qt, QIcon, QPixmap, QLabel, QDialog, QHBoxLayout,
-                          QTableWidgetItem, QFont, QLineEdit, QComboBox,
-                          QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
-                          QRegExpValidator, QRegExp, QVariant, QTextEdit,
-                          QListWidget, QAbstractItemView)
-except ImportError:
-    from PyQt5.Qt import (Qt, QIcon, QPixmap, QLabel, QDialog, QHBoxLayout,
-                          QTableWidgetItem, QFont, QLineEdit, QComboBox,
-                          QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
-                          QRegExpValidator, QRegExp, QVariant, QTextEdit,
-                          QListWidget, QAbstractItemView)
+    try:
+        # Fallback for Calibre with PyQt5
+        from PyQt5.Qt import (Qt, QIcon, QPixmap, QLabel, QDialog, QHBoxLayout,
+                             QTableWidgetItem, QFont, QLineEdit, QComboBox,
+                             QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
+                             QRegExpValidator, QRegExp, QVariant, QTextEdit,
+                             QListWidget, QAbstractItemView)
+        from PyQt5 import QtWidgets as QtGui
+    except ImportError:
+        try:
+            # Legacy fallback for very old Calibre with PyQt4
+            from PyQt4 import QtGui
+            from PyQt4.Qt import (Qt, QIcon, QPixmap, QLabel, QDialog, QHBoxLayout,
+                                 QTableWidgetItem, QFont, QLineEdit, QComboBox,
+                                 QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
+                                 QRegExpValidator, QRegExp, QVariant, QTextEdit,
+                                 QListWidget, QAbstractItemView)
+        except ImportError:
+            raise ImportError("Could not import Qt widgets. Please update Calibre.")
 
 from calibre.constants import iswindows
 from calibre.gui2 import gprefs, error_dialog, UNDEFINED_QDATETIME, info_dialog
