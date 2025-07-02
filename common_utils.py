@@ -23,9 +23,9 @@ from PyQt5 import QtWidgets as QtGui
 try:
     from PyQt5.Qt import QRegExpValidator, QRegExp
 except ImportError:
-    # Qt6 equivalents
-    from PyQt5.Qt import QRegularExpressionValidator as QRegExpValidator
-    from PyQt5.Qt import QRegularExpression as QRegExp
+    # Qt6 equivalents - these may not be available in Calibre's Qt6
+    # If this fails, we'll need to handle regex validation differently
+    pass
 
 from calibre.constants import iswindows
 from calibre.gui2 import gprefs, error_dialog, UNDEFINED_QDATETIME, info_dialog
