@@ -17,9 +17,15 @@ try:
     from qt.core import (Qt, QIcon, QPixmap, QLabel, QDialog, QHBoxLayout,
                         QTableWidgetItem, QFont, QLineEdit, QComboBox,
                         QVBoxLayout, QDialogButtonBox, QStyledItemDelegate, QDateTime,
-                        QRegExpValidator, QRegExp, QVariant, QTextEdit,
-                        QListWidget, QAbstractItemView)
+                        QVariant, QTextEdit, QListWidget, QAbstractItemView)
     from qt import QtWidgets as QtGui
+    # Try to import Qt6 classes first
+    try:
+        from qt.core import QRegularExpressionValidator as QRegExpValidator
+        from qt.core import QRegularExpression as QRegExp
+    except ImportError:
+        # Fallback for Qt5 compatibility
+        from qt.core import QRegExpValidator, QRegExp
 except ImportError:
     try:
         # Fallback for Calibre with PyQt5
