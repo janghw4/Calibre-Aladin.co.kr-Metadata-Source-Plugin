@@ -216,46 +216,68 @@ class Worker(Thread):  # Get details
         return re.search(r'wproduct\.aspx\?ItemId=(.+)', page_url).group(1)
     
     def parse_title_series(self, root):
-        # title_node = root.xpath('//a[@class="p_topt01"]/..') <div><a
-        # href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=125451796" class="Ere_bo_title">[eBook] Head First
-        # Python (개정판)</a> <span class="Ere_sub1_title">- 스스로 질문하며 답을 찾는 파이썬 학습서(Python 3), 개정판</span> <a
-        # href="/search/wsearchresult.aspx?SearchTarget=All&amp;SearchWord=9791162249857"><img
-        # src="//image.aladin.co.kr/img/shop/2018/icon_top_search.png" style="margin-bottom:-4px;"></a>
-        # | <a href="/shop/common/wseriesitem.aspx?SRID=111846" class="Ere_sub1_title Ere_sub_blue">Head First 시리즈 3</a>
-        # ......
-        # </div>
-        title_node = root.xpath('//a[@class="Ere_bo_title"]/..')
-        if not title_node:
-            return None, None, None
-        title_text = title_node[0].text_content().strip()
+        # Try to find title using the span with class "Ere_bo_title" (current structure)
+        title_node = root.xpath('//span[@class="Ere_bo_title"]')
+        if title_node:
+            title_text = title_node[0].text_content().strip()
         
-        series_node = title_node[0].xpath('.//a[contains(@href,"wseriesitem.aspx")]')
-        if not series_node:
-            return title_text, None, None
-        series_info = series_node[0].text_content().strip()
+        # Look for series information in the surrounding context
+        # Check if there are any series links nearby
+            parent_li = title_node[0].getparent().getparent()  # Go up to the <li> element
+            series_node = parent_li.xpath('.//a[contains(@href,"wseriesitem.aspx")]')
         
-        # title에서 series 지우기 
-        # 2016-02-03 안된다.
-        series_node_parent = series_node[0].getparent()
-        series_node_parent.getparent().remove(series_node_parent)
-        
-        # 2016-02-03 추가
-        # title_text = re.sub('\l\s*' + series_info, "", title_text)
-        title_text = re.sub(r'\|\s*' + series_info, "", title_text)
-        title_text = title_text.strip()
-        
-        if series_info:
-            match = re.search(r"\s+(\d+)\s*$", series_info)
-            if match:
-                series_index = match.group(1)
-                series_name = series_info[:-1 * len(match.group(0))]
-            else:
-                series_index = 0
-                series_name = series_info
+            if series_node:
+                series_info = series_node[0].text_content().strip()
             
-            return title_text, series_name, float(series_index)
+            # Remove series from title if it appears
+                title_text = re.sub(r'\|\s*' + re.escape(series_info), "", title_text)
+                title_text = title_text.strip()
+            
+            # Extract series index if present
+                match = re.search(r"\s+(\d+)\s*$", series_info)
+                if match:
+                    series_index = match.group(1)
+                    series_name = series_info[:-1 * len(match.group(0))]
+                else:
+                    series_index = 0
+                    series_name = series_info
+            
+                return title_text, series_name, float(series_index)
         
-        return title_text, None, None
+            return title_text, None, None
+    
+    # Fallback: Try the old method for backwards compatibility
+        title_node = root.xpath('//a[@class="Ere_bo_title"]/..')
+        if title_node:
+            title_text = title_node[0].text_content().strip()
+        
+            series_node = title_node[0].xpath('.//a[contains(@href,"wseriesitem.aspx")]')
+            if not series_node:
+                return title_text, None, None
+            series_info = series_node[0].text_content().strip()
+        
+        # Remove series from title
+            series_node_parent = series_node[0].getparent()
+            series_node_parent.getparent().remove(series_node_parent)
+        
+            title_text = re.sub(r'\|\s*' + series_info, "", title_text)
+            title_text = title_text.strip()
+        
+            if series_info:
+                match = re.search(r"\s+(\d+)\s*$", series_info)
+                if match:
+                    series_index = match.group(1)
+                    series_name = series_info[:-1 * len(match.group(0))]
+                else:
+                    series_index = 0
+                    series_name = series_info
+            
+                return title_text, series_name, float(series_index)
+        
+            return title_text, None, None
+    
+    # If all methods fail
+        return None, None, None
     
     def parse_authors(self, root):
         # # Build a dict of authors with their contribution if any in values
